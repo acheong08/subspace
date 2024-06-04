@@ -263,13 +263,13 @@ func main() {
 
 		httpd := &http.Server{
 			Handler:        certmanager.HTTPHandler(redir),
-			Addr:           net.JoinHostPort(httpIP, "80"),
+			Addr:           net.JoinHostPort(httpIP, httpPort),
 			WriteTimeout:   httpTimeout,
 			ReadTimeout:    httpTimeout,
 			MaxHeaderBytes: maxHeaderBytes,
 		}
 		if err := httpd.ListenAndServe(); err != nil {
-			logger.Fatalf("http server on port 80 failed: %s", err)
+			logger.Fatalf("http server on port %s failed: %s", httpPort, err)
 		}
 	}()
 
