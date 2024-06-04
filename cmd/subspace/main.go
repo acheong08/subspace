@@ -39,6 +39,7 @@ var (
 
 	// httpd
 	httpAddr   string
+	httpsAddr  string
 	httpHost   string
 	httpPrefix string
 
@@ -90,6 +91,7 @@ func init() {
 	cli.StringVar(&backlink, "backlink", "/", "backlink (optional)")
 	cli.StringVar(&httpHost, "http-host", "", "HTTP host")
 	cli.StringVar(&httpAddr, "http-addr", ":80", "HTTP listen address")
+	cli.StringVar(&httpsAddr, "https-addr", ":443", "HTTPS listen address")
 	cli.BoolVar(&httpInsecure, "http-insecure", false, "enable sessions cookies for http (no https) not recommended")
 	cli.BoolVar(&letsencrypt, "letsencrypt", true, "enable TLS using Let's Encrypt on port 443")
 	cli.BoolVar(&showVersion, "version", false, "display version and exit")
@@ -289,12 +291,6 @@ func main() {
 		},
 	}
 
-	// Override default for TLS.
-	if httpPort == "80" {
-		httpPort = "443"
-		httpAddr = net.JoinHostPort(httpIP, httpPort)
-	}
-
 	httpsd := &http.Server{
 		Handler:        r,
 		Addr:           httpAddr,
@@ -303,8 +299,12 @@ func main() {
 		MaxHeaderBytes: maxHeaderBytes,
 	}
 
+	if httpsAddr == "" {
+		httpsAddr = ":443"
+	}
+
 	// Enable TCP keep alives on the TLS connection.
-	tcpListener, err := net.Listen("tcp", httpAddr)
+	tcpListener, err := net.Listen("tcp", net.JoinHostPort(httpHost, httpsAddr))
 	if err != nil {
 		logger.Fatalf("listen failed: %s", err)
 		return
