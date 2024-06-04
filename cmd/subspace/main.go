@@ -304,7 +304,7 @@ func main() {
 	}
 
 	// Enable TCP keep alives on the TLS connection.
-	tcpListener, err := net.Listen("tcp", net.JoinHostPort(httpHost, httpsAddr))
+	tcpListener, err := net.Listen("tcp", httpsAddr)
 	if err != nil {
 		logger.Fatalf("listen failed: %s", err)
 		return
